@@ -4,21 +4,23 @@ const { switchDB, getDBModel } = require("../config/switchDb");
 const jwt = require("jsonwebtoken")
 const RootSchemas = new Map([['user', User], ['tenant', Tenant]])
 // const TenantSchemas = new Map([['tenant', Tenant]])
-exports.register = async (req, res) =>{
+
+exports.register = async (req, res) => {
     try {
         const rootDB = await switchDB('root', RootSchemas);
         const userModel = await getDBModel(rootDB, "user");
         const tenantModel = await getDBModel(rootDB, "tenant");
-        const {name, email, password} = req.body
-        const isUserExist = await userModel.findOne({email: email})
-        if(isUserExist){
+        const { name, email, password, domainName } = req.body
+
+        const isUserExist = await userModel.findOne({ email: email })
+        if (isUserExist) {
             return res.status(403).send("user already exist");
         }
-        const tenantId = email.split("@")[0] +"-"+ generateFourDigitNumber()
-        
-        const user = await userModel.create({name, email, password, tenant_id: tenantId})
-        
-        await tenantModel.create({tenant_id: tenantId})
+        const tenantId = email.split("@")[0] + "-" + generateFourDigitNumber()
+
+        const user = await userModel.create({ name, email, password, tenant_id: tenantId, domainName: domainName })
+
+        await tenantModel.create({ tenant_id: tenantId })
 
         user.hashed_password = undefined;
         user.salt = undefined;
@@ -27,18 +29,18 @@ exports.register = async (req, res) =>{
             message: "user register",
             user: user
         })
-
     } catch (error) {
-        return res.status(500).send("internal server error")
+        return res.status(500).json({ message: "internal server error" })
     }
 }
-exports.login = async (req, res) =>{
+
+exports.login = async (req, res) => {
     try {
-        const {email, password} = req.body;
+        const { email, password } = req.body;
         const rootDB = await switchDB('root', RootSchemas);
         const userModel = await getDBModel(rootDB, "user");
-        if(!email || !password){
-            return res.status(400).send("Send valid Data") 
+        if (!email || !password) {
+            return res.status(400).send("Send valid Data")
         }
         const user = await userModel.findOne({ email });
 
@@ -47,7 +49,7 @@ exports.login = async (req, res) =>{
         }
         const loginToken = jwt.sign(
             {
-              id: user._id
+                id: user._id
             },
             process.env.JWT_SECRET
         );
@@ -62,6 +64,7 @@ exports.login = async (req, res) =>{
         return res.status(500).send(error)
     }
 }
+
 function generateFourDigitNumber() {
     return Math.floor(1000 + Math.random() * 9000);
 }

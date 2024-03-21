@@ -2,9 +2,11 @@ const jwt = require("jsonwebtoken");
 const User = require("../model/user.model");
 const { switchDB, getDBModel } = require("../config/switchDb");
 const RootSchemas = new Map([['user', User]])
+
 exports.isAuthenticated = async (req, res, next) => {
     try {
         const auth = req.headers['authorization'];
+            console.log(auth,'af');
         const token = auth.replace("Bearer ", "")
         
         if (!token) {

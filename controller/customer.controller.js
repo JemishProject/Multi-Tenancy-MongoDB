@@ -2,6 +2,7 @@ const customer = require("../model/customer.model")
 const { switchDB, getDBModel } = require("../config/switchDb");
 const DbSchemas = new Map([['customer', customer]])
 // const TenantSchemas = new Map([['tenant', Tenant]])
+
 exports.addCustomer = async (req, res) =>{
     try {
         const customerDB = await switchDB(req.tenantId, DbSchemas);
@@ -18,6 +19,7 @@ exports.addCustomer = async (req, res) =>{
         return res.status(500).send("internal server error")
     }
 }
+
 exports.getCustomer = async (req, res) =>{
     try {
         const customerDB = await switchDB(req.tenantId, DbSchemas);

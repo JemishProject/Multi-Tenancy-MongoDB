@@ -8,7 +8,7 @@ const mongoOptions = {
   }
 exports.connectDB = () => {
     return new Promise((resolve, reject) => {
-      const mongoURL = `mongodb+srv://admin:admin123@cluster0.uba8vnz.mongodb.net`
+      const mongoURL = `mongodb://localhost:27017`
       mongoose
         .connect(mongoURL, mongoOptions)
         .then((conn) => {
@@ -18,3 +18,5 @@ exports.connectDB = () => {
         .catch((error) => reject(error))
     })
   }
+
+  

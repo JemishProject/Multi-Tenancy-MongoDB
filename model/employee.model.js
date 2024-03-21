@@ -3,32 +3,28 @@ const { Schema } = mongoose
 const { v1 } = require('uuid')
 const crypto = require('crypto')
 
-const userSchema = mongoose.Schema({
-    name: {
-        first_name: String,
-        last_name: String
+const employeeSchema = mongoose.Schema({
+    userName: {
+       type:String
+    },
+    firstName:{
+        type:String,
+
+    },
+    lastName:{
+        type:String
     },
     email: {
         type: String,
         required: true
     },
-    hashed_password: {
-        type: String,
-        required: true
-    },
-    domainName:{
-        type:String,
-        required: true
-    },
     salt: String,
     tenant_id: String,
-    created_on: {
-        type: Date,
-        default: Date.now
-    },
     updated_on: Date
+},{
+    timestamps:true
 })
-userSchema.virtual('password')
+employeeSchema.virtual('password')
     .set(function (password) {
         this._password = password
 
@@ -40,7 +36,7 @@ userSchema.virtual('password')
         return this._password
     })
 
-userSchema.methods = {
+employeeSchema.methods = {
     authenticate: function (plainText) {
         return this.encryptPassword(plainText) === this.hashed_password
     },
@@ -57,4 +53,4 @@ userSchema.methods = {
     }
 }
 
-module.exports = userSchema
+module.exports = employeeSchema
